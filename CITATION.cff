@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite the associated manuscript and the repository."
+title: "A Scalable Geodemographic Baseline for Traffic Safety Monitoring in a Middle-Income Country"
+type: software
+authors:
+  - family-names: "Eriskin"
+    given-names: "Ekinhan"
+    orcid: "https://orcid.org/0000-0002-0087-0933"
+    affiliation: "Süleyman Demirel University"
+title: "turkiye-traffic-safety-geodemography"
+version: 1.0.0
+date-released: 2026-04-09
+url: "https://github.com/ekinhaneriskin/turkiye-traffic-safety-geodemography"
