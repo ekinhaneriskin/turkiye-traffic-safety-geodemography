@@ -1,7 +1,5 @@
 cff-version: 1.2.0
 message: "If you use this repository, please cite the associated manuscript and the repository."
-title: "A Scalable Geodemographic Baseline for Traffic Safety Monitoring in a Middle-Income Country"
-type: software
 authors:
   - family-names: "Eriskin"
     given-names: "Ekinhan"
@@ -12,3 +10,21 @@ version: 1.0.0
 doi: 10.5281/zenodo.19482870
 date-released: 2026-04-09
 url: "https://github.com/ekinhaneriskin/turkiye-traffic-safety-geodemography"
+repository-code: "https://github.com/ekinhaneriskin/turkiye-traffic-safety-geodemography"
+keywords:
+  - traffic safety
+  - geodemography
+  - machine learning
+  - Türkiye
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Eriskin"
+      given-names: "Ekinhan"
+  journal: "ISPRS International Journal of Geo-Information"
+  title: "A Scalable Geodemographic Baseline for Traffic Safety Monitoring in a Middle-Income Country"
+  year: 2026
+  volume: 15
+  issue: 4
+  start: 178
+  doi: "10.3390/ijgi15040178"
