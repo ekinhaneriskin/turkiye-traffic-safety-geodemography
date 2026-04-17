@@ -1,3 +1,6 @@
+To cite this please;
+Eriskin, E. (2026). A Scalable Geodemographic Baseline for Traffic Safety Monitoring in a Middle-Income Country. ISPRS International Journal of Geo-Information, 15(4), 178. https://doi.org/10.3390/ijgi15040178
+
 # A Scalable Geodemographic Baseline for Traffic Safety Monitoring in a Middle-Income Country
 
 This repository contains the code, processed data, and replication materials for the manuscript:
