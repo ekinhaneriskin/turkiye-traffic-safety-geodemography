@@ -1,153 +1,118 @@
-To cite this please;
-Eriskin, E. (2026). A Scalable Geodemographic Baseline for Traffic Safety Monitoring in a Middle-Income Country. ISPRS International Journal of Geo-Information, 15(4), 178. https://doi.org/10.3390/ijgi15040178
-
 # A Scalable Geodemographic Baseline for Traffic Safety Monitoring in a Middle-Income Country
 
 This repository contains the code, processed data, and replication materials for the manuscript:
 
-**A Scalable Geodemographic Baseline for Traffic Safety Monitoring in a Middle-Income Country**
+**"A Scalable Geodemographic Baseline for Traffic Safety Monitoring in a Middle-Income Country"**
+
+---
 
 ## Overview
 
 This study evaluates whether routinely available demographic composition can serve as a scalable structural baseline for provincial traffic accident rates. The modeling pipeline combines:
 
-- compositional preprocessing using **isometric log-ratio (ILR)** transformations,
-- a **Tabular Residual Network (ResNet)** for nonlinear prediction,
-- pooled statistical reference models,
-- tree-based tabular benchmarks,
-- a simple temporal heuristic baseline,
-- and spatial residual diagnostics.
+* **Compositional Preprocessing:** Using Isometric Log-Ratio (ILR) transformations.
+* **Deep Learning:** A Tabular Residual Network (ResNet) for nonlinear prediction.
+* **Statistical Benchmarks:** Pooled Linear, Poisson, and Negative Binomial models.
+* **Machine Learning Benchmarks:** Random Forest and XGBoost.
+* **Spatial Analysis:** Residual diagnostics and Moran’s I statistics.
 
 The empirical application uses province–year data from **Türkiye**.
 
+---
+
 ## Repository Contents
 
-- `Accident_Model_with_Demographic_Data.ipynb` — main analysis notebook
-- `masterData-rate2.xlsx` — processed province–year dataset used in the study
-- `requirements.txt` — Python package requirements
-- `LICENSE` — MIT License
-- `README.md` — repository description and replication guide
+* `Accident_Model_with_Demographic_Data.ipynb` — Main analysis notebook.
+* `masterData-rate2.xlsx` — Processed province–year dataset used in the study.
+* `requirements.txt` — Python package requirements.
+* `LICENSE` — MIT License.
+* `README.md` — Repository description and replication guide.
+
+---
 
 ## Data
 
 The analysis is based on province–year data for **81 provinces in Türkiye**.
 
-### Time coverage
-- **Training period:** 2008–2019
-- **Excluded period:** 2020–2021
-- **Calibration/evaluation period:** 2022–2024
+### Time Coverage
+* **Training Period:** 2008–2019
+* **Excluded Period:** 2020–2021 (COVID-19 regime disruption)
+* **Calibration/Evaluation Period:** 2022–2024
 
 ### Variables
-The target variable is:
+* **Target:** Accident Rate Per Million Population.
+* **Explanatory:** Sex composition, education composition, age composition, and GDP per capita.
+* **Source:** Raw data originate from the Turkish Statistical Institute (TUIK).
 
-- **Accident Rate Per Million Population**
-
-The explanatory variables include:
-
-- sex composition,
-- education composition,
-- age composition,
-- GDP per person.
-
-### Data source
-The raw data originate from the **Turkish Statistical Institute (TUIK)**.
-
-The file `masterData-rate2.xlsx` contains the processed province–year dataset used in the manuscript.
+---
 
 ## Preprocessing Workflow
 
-The main preprocessing steps are:
-
+The main preprocessing steps implemented in the notebook:
 1. Construct the province–year panel.
 2. Convert sex, education, and age variables into population shares.
-3. Add a small positive perturbation to compositional entries to avoid zero-related log-ratio issues.
-4. Apply **ILR transformation** separately to:
-   - sex composition,
-   - education composition,
-   - age composition.
-5. Transform GDP using `log(1 + GDP)`.
-6. Exclude years **2020–2021** to avoid regime disruption associated with the COVID-19 period.
-7. Scale model inputs using a `RobustScaler` fitted on the **training period only**.
-8. Transform the target variable using a **Yeo–Johnson PowerTransformer** for model training and invert back to the original scale for reporting.
+3. Apply **ILR transformation** to compositions to address the Aitchison geometry.
+4. Log-transform GDP: $\log(1 + \text{GDP})$.
+5. Scale inputs using a `RobustScaler` (fitted on training data only).
+6. Target transformation via **Yeo–Johnson PowerTransformer**.
+
+---
 
 ## Models Included
 
-The repository reproduces the following evaluated specifications:
+### 1. Proposed Model
+* **Tabular ResNet Seed-Ensemble:** Arithmetic mean of predictions from the top 5 performing seeds (retained if $R^2 > 0.50$ in the calibration window).
 
-### Proposed model
-- **Tabular ResNet seed-ensemble**
+### 2. Benchmarks
+* **Representative Single Model:** Best performing single seed (Seed 63).
+* **Statistical:** Linear, Poisson, and Negative Binomial (pooled).
+* **Tree-Based:** Random Forest and XGBoost.
+* **Heuristic:** LVDF (2019 Last Value Carried Forward).
 
-### Representative single model
-- **Best Seed 63**
-
-### Pooled statistical reference models
-- **Linear (pooled)**
-- **Poisson (pooled)**
-- **Negative Binomial (pooled)**
-
-### Tree-based tabular benchmarks
-- **Random Forest**
-- **XGBoost**
-
-### Temporal heuristic
-- **LVDF (2019 Carry-Forward)**
+---
 
 ## Training and Evaluation Design
 
-The study uses a **time-forward design**:
+* **Design:** Time-forward split (Train: 2008–2019; Eval: 2022–2024).
+* **Loss Function:** Huber Loss.
+* **Optimizer:** AdamW (LR: 1e-3, Weight Decay: 0.015).
+* **Spatial Validation:** Province-level contiguity weights based on queen adjacency.
 
-- Models are trained on **2008–2019**
-- Predictions are evaluated on **2022–2024**
-
-The 2022–2024 window is used as a **calibration/evaluation period**, not as a fully independent held-out test set.
-
-### ResNet training procedure
-- Loss: **Huber loss**
-- Optimizer: **AdamW**
-- Learning rate: **1e-3**
-- Weight decay: **0.015**
-- Batch size: **32**
-- Maximum epochs: **3000**
-- Learning-rate adaptation: **ReduceLROnPlateau**
-- Checkpointing frequency: every **10 epochs**
-
-### Seed-ensemble construction
-- Candidate seeds evaluated: **15**
-- Selection rule: retain seeds with calibration/evaluation **R² > 0.50**
-- Retained seeds: **5**
-- Final ensemble prediction: arithmetic mean of retained-seed predictions
-
-### Important note
-The benchmarking framework is **not a fully symmetric hyperparameter-optimization exercise**.  
-The ResNet uses calibration-driven checkpoint selection and seed filtering, whereas the added benchmark models are implemented as pragmatic reference specifications under fixed settings.
-
-## Outputs Reproduced
-
-The repository reproduces the core outputs reported in the manuscript, including:
-
-- benchmark comparison tables,
-- signed prediction error summaries,
-- ECDF of signed errors,
-- feature-sensitivity plot,
-- year-wise error distributions,
-- residuals-versus-predicted plot,
-- province-level spatial residual map,
-- Moran’s I statistics for observed accident rates and residuals.
-
-## Spatial Diagnostics
-
-Spatial validation is conducted using province-level contiguity weights based on **queen adjacency**.
-
-The repository computes:
-
-- **Moran’s I** for observed accident rates,
-- **Moran’s I** for model residuals.
-
-The residual map reflects **province-level mean residuals aggregated over 2022–2024**.
+---
 
 ## How to Run
 
-1. Install dependencies:
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/ekinhaneriskin/turkiye-traffic-safety-geodemography.git](https://github.com/ekinhaneriskin/turkiye-traffic-safety-geodemography.git)
+    cd turkiye-traffic-safety-geodemography
+    ```
 
-```bash
-pip install -r requirements.txt
+2.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3.  **Run the analysis:**
+    Launch Jupyter Notebook or JupyterLab and open `Accident_Model_with_Demographic_Data.ipynb`.
+
+---
+
+## Citation
+
+If you find this research or code useful, please cite our paper:
+
+> Eriskin, E. (2026). A Scalable Geodemographic Baseline for Traffic Safety Monitoring in a Middle-Income Country. *ISPRS International Journal of Geo-Information*, 15(4), 178. https://doi.org/10.3390/ijgi15040178
+
+```bibtex
+@article{eriskin2026traffic,
+  title={A Scalable Geodemographic Baseline for Traffic Safety Monitoring in a Middle-Income Country},
+  author={Eriskin, Ekinhan},
+  journal={ISPRS International Journal of Geo-Information},
+  volume={15},
+  number={4},
+  pages={178},
+  year={2026},
+  publisher={MDPI},
+  doi={10.3390/ijgi15040178}
+}
